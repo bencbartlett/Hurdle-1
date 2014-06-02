@@ -1,0 +1,2283 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\usepackage{fancyhdr}% http://ctan.org/pkg/fancyhdr
+\usepackage{listings}
+\date{}
+\lstloadlanguages{Python}
+\lstset{language=Python,tabsize=2}
+\fancyhead{}% Clear all headers
+%\fancyfoot{}% Clear all footers
+\fancyhead[L]{Physics 11}
+\fancyhead[C]{Hurdle 1}% Place "My Name" in Center of header
+\fancyhead[R]{Ben Bartlett}
+\renewcommand{\headrulewidth}{1pt}% Remove header rule
+%\renewcommand{\footrulewidth}{0pt}% Remove footer rule
+\pagestyle{fancy}% Set page style to "fancy"
+
+\let\oldenumerate=\enumerate
+\def\enumerate{
+\oldenumerate
+\setlength{\itemsep}{0pt}
+}
+\let\olditemize=\itemize
+\def\itemize{
+\olditemize
+\setlength{\itemsep}{0pt}
+}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement !tbph
+\paperfontsize 10
+\spacing single
+\use_hyperref false
+\papersize letterpaper
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 0.5in
+\topmargin 1in
+\rightmargin 0.5in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip smallskip
+\quotes_language english
+\papercolumns 2
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+twocolumn[   
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+begin{@twocolumnfalse} 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Title
+\paragraph_spacing single
+\noindent
+
+\series bold
+Ph11: Hurdle 1
+\end_layout
+
+\begin_layout Author
+\paragraph_spacing single
+\noindent
+
+\series bold
+Ben Bartlett
+\begin_inset Newline newline
+\end_inset
+
+
+\series default
+\size normal
+bartlett@caltech.edu
+\end_layout
+
+\begin_layout Abstract
+Given a set of glass spheres of various sizes resting atop a bed of sand
+ which is disturbed at regular intervals by an insect searching for food,
+ we utilize a computational model to simulate the movements of the insect
+ over the sand and the subsequent effects on the sand levels and sphere
+ heights.
+ We model the insect's attraction to the food sources as analogous to a
+ potential well created by a group of electric point charges and model the
+ various sand heights in a large square matrix.
+ The distance the spheres sink after each iteration of the program was found
+ by treating the sand underneath moving objects as behaving in a slightly
+ vibrofluidized state.
+ The food is spread evenly over the bed of sand, but the presence of the
+ spheres causes an asymmetry in the food distribution.
+ This, combined with the random initial placement of the beetle, creates
+ a highly stochastic system, suggesting the use of numerical methods to
+ solve the problem.
+ Using Monte Carlo methods, we determine a distribution of final sphere
+ heights with respect to sphere radii and time elapsed.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+	
+\backslash
+end{@twocolumnfalse}
+\end_layout
+
+\begin_layout Plain Layout
+
+]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+The Problem
+\end_layout
+
+\begin_layout Standard
+
+\size small
+\begin_inset Quotes eld
+\end_inset
+
+Solid glass spheres of various sizes sit on a bed of sand in a large glass
+ box.
+ On this mini-desert, beetles crawl vigorously in search of food.
+ The masses of the glass spheres range from about that of individual sand
+ grains to much larger than the beetles.
+ Every morning, beetle food and a small amount of sand are shaken uniformly
+ onto the surface.
+ This continues until the added sand has a height many times that of the
+ largest glass spheres.
+ Determine the height distribution above the original sand surface for the
+ various size spheres as a function of time.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Assumptions
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
+
+\size small
+For the purposes of simplifying the problem, we make several assumptions
+ in the interpretation of the problem:
+\end_layout
+
+\begin_layout Itemize
+\noindent
+
+\size small
+The beetle is unable to fly or crawl over the glass spheres and can push
+ them around.
+\end_layout
+
+\begin_layout Itemize
+\noindent
+
+\size small
+The beetle follows specific search patterns for food as outlined in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Approximating-the-beetle's"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+\noindent
+
+\size small
+Coefficient of kinetic friction of sand against glass is the same as that
+ of glass against glass (
+\begin_inset Formula $\mu_{k}=0.4$
+\end_inset
+
+) [1] due to similar molecular structure.
+\end_layout
+
+\begin_layout Itemize
+
+\size small
+For physical purposes, the size of a grain of sand is assumed to be sufficiently
+ small enough to exhibit fluid-like behaviors when excited through vibration
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+\noindent
+
+\size small
+For logging purposes, the size of a grain of sand is 
+\begin_inset Formula $1mm$
+\end_inset
+
+ diameter (chosen to make the size of the sandLevels array manageable -
+ see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:The-depressSand()-function"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+\noindent
+
+\size small
+The bed of sand is a 
+\begin_inset Formula $1m\times1m$
+\end_inset
+
+ box
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+\noindent
+
+\size small
+The beetle is approximated as spheres with radius 
+\begin_inset Formula $10mm$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+\noindent
+
+\size small
+Mass of beetle is 
+\begin_inset Formula $30g$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+\noindent
+
+\size small
+Glass spheres range from size of a grain of sand (
+\begin_inset Formula $.5mm$
+\end_inset
+
+ radius) to 20 times the beetle's radius (
+\begin_inset Formula $200mm$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Itemize
+Density of sand 
+\size small
+
+\begin_inset Formula $\rho_{glass}=1281\frac{kg}{m^{3}}=.001281\frac{g}{mm^{3}}$
+\end_inset
+
+
+\size default
+ [2]
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+\noindent
+
+\size small
+Density of glass 
+\begin_inset Formula $\rho_{glass}=2.6\times10^{3}\frac{kg}{m^{3}}=.0026\frac{g}{mm^{3}}$
+\end_inset
+
+ [3]
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+\noindent
+
+\size small
+The beetle must be within 1mm of its food to consume it.
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+\noindent
+
+\size small
+Some beetles (Hercules beetles) can lift upwards of 850 times their body
+ mass [4], so we assume the beetle can push spheres of arbitrarily large
+ masses over the sand without necessarily lifting them.
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+\noindent
+
+\size small
+The beetle will eat all food particles before a new layer of sand and food
+ is scattered in the box, even if large spheres must be pushed to access
+ the remaining food.
+\end_layout
+
+\begin_layout Itemize
+\paragraph_spacing single
+\noindent
+
+\size small
+All sand and food particles falling on glass spheres will slide off of the
+ sphere and land on the sand below.
+\end_layout
+
+\begin_layout Itemize
+
+\size small
+Spheres will immediately begin to sink at their terminal velocity in sand
+ that is in a vibrofluidized state.
+\end_layout
+
+\begin_layout Section
+Analysis
+\end_layout
+
+\begin_layout Standard
+
+\size small
+The problem was originally interpreted to be a granular convection problem
+ - the argument could be made that the beetle's movements serve purely to
+ provide a continuous impulse into the system, vibrofluidizing the sand
+ particles and causing the larger glass balls to rise to the top, while
+ the smaller ones sink to the bottom due to respective sphere packing densities.
+ Thus, the specific movements of the beetle could be ignored in favor of
+ a simpler approach.
+ However, supplying enough energy to keep a large bed of sand and glass
+ beads in a completely vibrofluidized state (as opposed to a locally perturbed
+ state) would require an unrealistically large energy output from the beetle.
+ Furthermore, the presence of large amounts of very small particles in the
+ box would ensure that almost all of the glass spheres would stay at the
+ top of the sand in this model, due to their comparatively massive size.
+ Finally, the granular convection explanation is optimal for materials of
+ the same density, but the density of glass is far greater than sand, so
+ sphere packing is not important enough of a variable to play a major role
+ in height distribution.
+ Thus, the problem was approached in less simplistic manner that concentrated
+ more on the beetle's movements and their effects.
+ To simulate these movements and the subsequent effects on the system, a
+ Python script was created to simulate the conditions in the problem and
+ run the 
+\begin_inset Quotes eld
+\end_inset
+
+experiment
+\begin_inset Quotes erd
+\end_inset
+
+ many times.
+ There were two major components to this script: approximating the beetle's
+ movements in its search for food and calculating the effects said movement
+ would have on the sand height and the sphere heights.
+ Both of these problems are discussed below.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Approximating-the-beetle's"
+
+\end_inset
+
+Approximating the beetle's motion
+\end_layout
+
+\begin_layout Standard
+
+\size small
+Several methods of approximating the beetle's movements were considered,
+ ranging from simply pointing the beetle in the direction of the nearest
+ piece of food to using Lagrangian mechanics and the principle of least
+ action to determine an action-minimizing path for the beetle.
+ However, the former method was decidedly too simple to mimic the movements
+ of a beetle, while the latter was too complex, making the beetle's path
+ too efficient to seem realistic.
+ However, in the latter option, the food particles would be modeled like
+ point charges in an electric field; this idea suggested a simpler and more
+ elegant solution: the beetle would simply follow the gradient of the potential
+ field created by the food particles, like a hiker following the path of
+ steepest ascent.
+\end_layout
+
+\begin_layout Standard
+
+\size small
+Thus, if we model the attractive potential the food creates as analogous
+ to that of a set of point charges, then the potential well for an individual
+ food particle is:
+\begin_inset Formula 
+\[
+V=\frac{Q}{4\pi\epsilon_{0}r}\propto\frac{1}{r}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $Q$
+\end_inset
+
+ is charge and 
+\begin_inset Formula $r$
+\end_inset
+
+ is separation.
+ Since all food particles are considered to be identical in this model,
+ we can discard 
+\begin_inset Formula $Q$
+\end_inset
+
+ from our calculations and discard 
+\begin_inset Formula $\frac{1}{4\pi\epsilon_{0}}$
+\end_inset
+
+ as an arbitrary constant.
+ We can reparametrize this potential with respect to 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+ in the form:
+\begin_inset Formula 
+\[
+V=\frac{1}{r}=\frac{1}{\sqrt{\Delta x^{2}+\Delta y^{2}}}=\frac{1}{\sqrt{(x-x_{0})^{2}+(y-y_{0})^{2}}}.
+\]
+
+\end_inset
+
+This will give us the potential, as experienced from 
+\begin_inset Formula $(x,y)$
+\end_inset
+
+, for a single food particle at a coordinates 
+\begin_inset Formula $(x_{0},y_{0})$
+\end_inset
+
+.
+ Since the food and sand were stated to be distributed uniformly, they were
+ modeled as falling down onto the box below on a regularly spaced grid pattern;
+ if they initially fell on a glass sphere, they were assumed to have slid
+ off before the beetle was released.
+ (Though a quick calculation, given a coefficient of kinetic friction of
+ sand on glass of 
+\begin_inset Formula $\mu_{k}=0.4$
+\end_inset
+
+, will show that the sand would stay on top of the spheres for any angle
+ 
+\begin_inset Formula $\phi=62^{\circ}$
+\end_inset
+
+ above the horizontal, we assume the sand and food was falling from a significan
+t enough height that the disturbance resulting from the collision with the
+ sphere was sufficient to knock it to the edges.) We sum the potentials of
+ the 
+\begin_inset Formula $n$
+\end_inset
+
+ food particles in the bed of sand and obtain the formula:
+\begin_inset Formula 
+\[
+V(x,y)=\sum_{i=1}^{n}\frac{1}{\sqrt{(x-x_{i})^{2}+(y-y_{i})^{2}}},
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+ are the coordinates of the beetle and 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $y_{i}$
+\end_inset
+
+ are the coordinates of the 
+\begin_inset Formula $i^{th}$
+\end_inset
+
+ food particle.
+ Since the beetle will want to maximize its height on the potential function
+ at any given moment (by approaching food) while expending the least amount
+ of energy (by moving the shortest distance), it will want to follow the
+ path of steepest ascent on this potential function, given by the gradient
+ of the potential function, such that 
+\begin_inset Formula $\vec{v}\propto\vec{\nabla}V$
+\end_inset
+
+.
+ Thus,
+\begin_inset Formula 
+\[
+\vec{v}(x,y)\propto\vec{\nabla}\left(\sum_{i=1}^{n}\frac{1}{\sqrt{(x-x_{i})^{2}+(y-y_{i})^{2}}}\right).
+\]
+
+\end_inset
+
+Since the gradient returns a vector of partial derivatives, and 
+\begin_inset Formula $\frac{\partial}{\partial x}(f_{1}+f_{2})=\frac{\partial}{\partial x}f_{1}+\frac{\partial}{\partial x}f_{2}$
+\end_inset
+
+ for arbitrary 
+\begin_inset Formula $f_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $f_{2}$
+\end_inset
+
+, then the gradient of a sum of potential functions is equivalent to the
+ sum of the gradients of the potential functions.
+ Thus,
+\begin_inset Formula 
+\[
+\vec{v}(x,y)\propto\vec{\nabla}\left(\sum_{i=1}^{n}V_{i}\right)=\sum_{i=1}^{n}\vec{\nabla}V_{i}=\vec{\nabla}V_{total}.
+\]
+
+\end_inset
+
+Computing this manually, we have: 
+\begin_inset Formula 
+\begin{eqnarray*}
+\vec{\nabla}V_{i} & = & \left\langle \frac{x_{i}-x}{\sqrt{(x-x_{i})^{2}+(y-y_{i})^{2}}^{3}},\,\frac{y_{i}-y}{\sqrt{(x-x_{i})^{2}+(y-y_{i})^{2}}^{3}}\right\rangle .
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\size small
+Thus, if we assume that the beetle moves at a constant velocity, then we
+ simply solve for some scalar multiple (the beetle's speed, denoted as 
+\begin_inset Formula $s_{b}$
+\end_inset
+
+) of the unit vector of 
+\begin_inset Formula $\vec{v}$
+\end_inset
+
+ to find the true velocity: 
+\size footnotesize
+
+\begin_inset Formula 
+\begin{eqnarray}
+\vec{v} & = & s_{b}\widehat{\vec{\nabla}V}_{total}\nonumber \\
+ & = & s_{b}\sum_{i=1}^{n}\left[\frac{\left\langle \frac{x_{i}-x}{\sqrt{(x-x_{i})^{2}+(y-y_{i})^{2}}^{3}},\,\frac{y_{i}-y}{\sqrt{(x-x_{i})^{2}+(y-y_{i})^{2}}^{3}}\right\rangle }{\sqrt{\frac{(x_{i}-x)^{2}+(y_{i}-y)^{2}}{\left((x-x_{i})^{2}+(y-y_{i})^{2}\right)^{3}}}}\right]\label{eq:-2}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Effects-of-object"
+
+\end_inset
+
+Effects of object motion on sand elevation levels
+\end_layout
+
+\begin_layout Standard
+
+\size small
+Due to time constraints on both computational complexity and coding time,
+ a simplified model of interactions between the beetle, the spheres, and
+ the sand elevation levels had to be used.
+ We approximate the beetle's geometry as that of a sphere.
+ If we have an arbitrary sphere of mass 
+\begin_inset Formula $m$
+\end_inset
+
+, radius 
+\begin_inset Formula $R$
+\end_inset
+
+, and density 
+\begin_inset Formula $\rho$
+\end_inset
+
+ sitting in a bed of sand at some depth such that it has an effective base
+ of area 
+\begin_inset Formula $A$
+\end_inset
+
+, then we have a downward force of 
+\begin_inset Formula $F_{g}=mg$
+\end_inset
+
+ and an upward force of 
+\begin_inset Formula $F_{sand}$
+\end_inset
+
+.
+ If we vibrofluidize the sand with a disturbance, such as the beetle or
+ a sphere moving in the sand, we can loosely approximate the equations of
+ force in the sand as that of a viscous fluid, in the form 
+\begin_inset Formula $F_{sand}=F_{b}+F_{v}$
+\end_inset
+
+ where 
+\begin_inset Formula $F_{b}$
+\end_inset
+
+ represents the effective buoyancy force and 
+\begin_inset Formula $F_{v}$
+\end_inset
+
+ is the resistive force due to viscosity.
+ Since the spheres would be sinking at a very low velocity through what
+ is effectively a very viscous medium, we use equations describing Stoke's
+ drag for low velocity objects in high-viscosity non-Newtonian fluids to
+ model the sinking objects.
+ We solve for the buoyant force 
+\begin_inset Formula 
+\[
+F_{b}=mg\frac{\rho_{s}}{\rho_{g}},
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $m$
+\end_inset
+
+ is object mass, 
+\begin_inset Formula $\rho_{s}$
+\end_inset
+
+ is the density of sand, and 
+\begin_inset Formula $\rho_{g}$
+\end_inset
+
+ is the density of glass, and use the equation for resistive force in Stoke's
+ drag for 
+\begin_inset Formula $F_{v}$
+\end_inset
+
+ of the form: 
+\begin_inset Formula 
+\[
+F_{v}=6\pi\eta Rv
+\]
+
+\end_inset
+
+for viscosity 
+\begin_inset Formula $\eta$
+\end_inset
+
+, sphere radius 
+\begin_inset Formula $R$
+\end_inset
+
+, and sinking velocity 
+\begin_inset Formula $v$
+\end_inset
+
+.
+ If we assume that the sphere quickly accelerates to its terminal velocity
+ and falls at constant velocity 
+\begin_inset Formula $v_{t}$
+\end_inset
+
+, we have:
+\begin_inset Formula 
+\begin{eqnarray*}
+mg\frac{\rho_{s}}{\rho_{g}}+6\pi\eta Rv_{t} & = & mg\\
+6\pi\eta Rv_{t} & = & mg(1-\frac{\rho_{s}}{\rho_{g}})\\
+v_{t} & = & \frac{mg(1-\frac{\rho_{s}}{\rho_{g})}}{6\pi\eta R}
+\end{eqnarray*}
+
+\end_inset
+
+Expressing the mass of a glass sphere as 
+\begin_inset Formula $m=V\rho_{glass}$
+\end_inset
+
+ for volume 
+\begin_inset Formula $V$
+\end_inset
+
+, we have:
+\end_layout
+
+\begin_layout Standard
+
+\size small
+\begin_inset Formula 
+\begin{eqnarray}
+v_{t} & = & \frac{V\rho_{glass}\cdot g(1-\frac{\rho_{s}}{\rho_{g}})}{6\pi\eta R}\nonumber \\
+ & = & \frac{\frac{4}{3}\pi R^{3}\rho_{glass}\cdot g(1-\frac{\rho_{s}}{\rho_{g}})}{6\pi\eta R}\nonumber \\
+ & = & \frac{2R^{2}g(\rho_{g}-\rho_{s})}{9\eta}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\size small
+In a paper by Knappman, [5] it was found that in a bed of sand that was
+ vibrofluidized by passing air through it, viscosity with respect to flow
+ rate 
+\begin_inset Formula $w$
+\end_inset
+
+ in 
+\begin_inset Formula $\mbox{L\cdot sec^{-1}}$
+\end_inset
+
+ is of the form 
+\begin_inset Formula $\eta(w)=2.3\cdot\frac{78}{w-78}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mbox{78L\cdot sec^{-1}}$
+\end_inset
+
+ was the critical flow rate where sand started behaving like a liquid.
+ Since the sand in the box would only be barely fluidized by the comparably
+ small vibrations of the beetle and the objects, we choose 
+\begin_inset Formula $w=\mbox{79L\cdot sec^{-1}}$
+\end_inset
+
+ as our choice for 
+\begin_inset Formula $\eta$
+\end_inset
+
+, though other choices could be made based on empirical data from experiments
+ involving beetle movements across sand.
+ Note that even if this choice of equivalent flow rate is incorrect, the
+ ratio of the terminal velocities 
+\begin_inset Formula $\frac{v_{t1}}{v_{t2}}=\frac{R_{1}^{2}}{R_{2}^{2}}$
+\end_inset
+
+ for spheres with respect to masses remains independent of 
+\begin_inset Formula $\eta$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\size small
+For the purposes of this program, we assume that when the spheres and/or
+ beetles are moving, the sand is locally vibrofluidized and the moving objects
+ will quickly accelerate to their terminal velocity 
+\begin_inset Formula $v_{t}$
+\end_inset
+
+ and sink at that velocity, stopping immediately once they stop moving across
+ the sand.
+ As the objects sink, the sand levels are lowered under the object.
+ However, since sand must be conserved, an equal amount of sand is positively
+ displaced in a ring with radius 
+\begin_inset Formula $\sqrt{2}$
+\end_inset
+
+ times the radius of the object depressing the sand.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+
+\size small
+The 
+\begin_inset Formula $\sqrt{2}$
+\end_inset
+
+ ratio of outer to inner radii was chosen so that the altitudes of displacement
+ would have the same magnitude - a sphere with radius 
+\begin_inset Formula $10mm$
+\end_inset
+
+ that sank 
+\begin_inset Formula $1mm$
+\end_inset
+
+ in the sand would create a ring of outer radius 
+\begin_inset Formula $10\sqrt{2}mm$
+\end_inset
+
+ and inner radius 
+\begin_inset Formula $10mm$
+\end_inset
+
+ also with height 
+\begin_inset Formula $1mm$
+\end_inset
+
+, but where the sand is elevated, not depressed.
+\end_layout
+
+\end_inset
+
+This is consistent with qualitative observations about sand interactions:
+ dragging a rock across the sand with a constant downward force will create
+ a trench with a depressed center and elevated sides, but the rock will
+ remain at roughly the same level in the sand, since the material in front
+ of it that it elevated while moving was later depressed; however, grinding
+ the rock with the same downward force in a tight circle in the same place
+ in the sand will push it further into the sand.
+\end_layout
+
+\begin_layout Standard
+
+\size small
+Note that the degree to which the spheres are depressed in the sand is not
+ only proportional to their terminal velocity in fluidized sand, but also
+ to the amount they are moved in a localized region.
+ Thus, it is expected that the displacement of the spheres from sand level,
+ given no outside interference from other spheres, should be proportional
+ to the cube of the radius, since the terminal velocity is proportional
+ to the square of the radius, and the number of times the beetle must disturb
+ the sphere to access food around its perimeter is proportional to the circumfer
+ence of the sphere, which is proportional the the radius.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Calculating-the-distance"
+
+\end_inset
+
+Calculating the distance a sphere moves on collision
+\end_layout
+
+\begin_layout Standard
+
+\size small
+When the beetle collides with a sphere, we approximate the collision as
+ an impulse into the sphere applied once every time the beetle moves every
+ cycle in the program - thus, the beetle repeatedly 
+\begin_inset Quotes eld
+\end_inset
+
+kicks
+\begin_inset Quotes erd
+\end_inset
+
+ the spheres as it moves for a distance which is dependent on the coefficient
+ of friction in the sand and the change in height of the sand.
+ We approximate the energy loss due to displacing the sand beneath the sphere
+ while rolling as equal to that of simply sliding the sphere over an unyielding
+ body of sand.
+ Thus, the problem arises to calculate the distance the sphere travels over
+ each 
+\begin_inset Quotes eld
+\end_inset
+
+kick
+\begin_inset Quotes erd
+\end_inset
+
+ the beetle imparts into it.
+ This is a fairly simple calculation.
+ For an initial velocity of the beetle of 
+\begin_inset Formula $v_{i_{1}}$
+\end_inset
+
+ and a stationary sphere, we calculate the final sphere velocity after the
+ collision with the beetle using elastic collisions:
+\end_layout
+
+\begin_layout Standard
+
+\size small
+\begin_inset Formula 
+\[
+v_{f_{2}}=\frac{v_{i_{2}}(m_{s}-m_{b})+2m_{b}v_{i_{b}}}{m_{b}+m_{s}},
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $m_{b}$
+\end_inset
+
+ and 
+\begin_inset Formula $m_{s}$
+\end_inset
+
+ are the beetle and sphere masses, 
+\begin_inset Formula $v_{i_{s}}$
+\end_inset
+
+ and 
+\begin_inset Formula $v_{f_{s}}$
+\end_inset
+
+ are the initial and final sphere velocities, and 
+\begin_inset Formula $v_{i_{b}}$
+\end_inset
+
+ and 
+\begin_inset Formula $v_{f_{b}}$
+\end_inset
+
+ are the initial and final beetles, respectively.
+ Since the sphere is initially stationary, we have:
+\begin_inset Formula 
+\[
+v_{f_{2}}=\frac{2m_{b}v_{i_{b}}\sin\theta}{m_{b}+m_{s}},
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the angle between the beetle's velocity vector and the edge of the sphere.
+ The reason for the presence of 
+\begin_inset Formula $\sin\theta$
+\end_inset
+
+ in this term is due to the fact that the vector orthogonal to the edge
+ of the sphere will push the sphere in that direction, while the one parallel
+ to the sphere will only torque it about its axis in that direction.
+ Now, we solve for the distance the sphere will travel over the sands of
+ changing heights with this initial velocity.
+ Given conservation of energy and redefining the sphere velocity immediately
+ after the collision, 
+\begin_inset Formula $v_{f_{2}}$
+\end_inset
+
+ as the initial velocity after the collision, 
+\begin_inset Formula $v_{i}$
+\end_inset
+
+, we have:
+\begin_inset Formula 
+\begin{eqnarray*}
+E_{i} & = & E_{f}\\
+\frac{1}{2}mv_{i}^{2} & = & F_{\mu}\cdot\Delta x+\Delta V\\
+\frac{1}{2}mv_{i}^{2} & = & \mu_{k}mg\Delta x+mg\Delta h\\
+v_{i}^{2} & = & 2g(\mu_{k}\Delta x+\Delta h)\\
+v_{i} & = & \sqrt{2g(\mu_{k}\Delta x+\Delta h)}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\size small
+Thus, the initial velocity required to slide over sand with coefficient
+ of kinetic friction 
+\begin_inset Formula $\mu_{k}$
+\end_inset
+
+ and change in elevation 
+\begin_inset Formula $\Delta h$
+\end_inset
+
+ is 
+\begin_inset Formula $\sqrt{2g(\mu_{k}\Delta x+\Delta h)}$
+\end_inset
+
+.
+ However, since 
+\begin_inset Formula $h$
+\end_inset
+
+ is not necessarily a linear function, we compute the deceleration over
+ time and apply it every iteration in the program:
+\begin_inset Formula 
+\begin{eqnarray}
+v_{f}^{2} & = & v_{i}^{2}+2a\Delta x\nonumber \\
+0 & = & \sqrt{2g(\mu_{k}\Delta x+\Delta h)}^{2}+2a\Delta x\nonumber \\
+-2a\Delta x & = & 2g(\mu_{k}\Delta x+\Delta h)\nonumber \\
+a & = & -g(\mu_{k}+\frac{\Delta h}{\Delta x})
+\end{eqnarray}
+
+\end_inset
+
+Thus, we set the initial velocity of the sphere immediately after the collision
+ to be 
+\begin_inset Formula $v_{f_{2}}=\frac{2m_{b}v_{i_{b}}cos\theta}{m_{b}+m_{s}}$
+\end_inset
+
+ and decelerate this velocity by the deceleration 
+\begin_inset Formula $a=-g(\mu_{k}+\frac{\Delta h}{\Delta x})$
+\end_inset
+
+ every iteration of the program until the sphere's velocity is less than
+ or equal to zero, allowing us to compute the distance traveled while taking
+ into account the effects of changing elevation levels without the use of
+ integration.
+\end_layout
+
+\begin_layout Section
+Implementation
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The entirety of the source code for this project is attached at the end
+ of this paper, should you need to reference it.
+ Also, a digital version can be downloaded at https://db.tt/Qn4vtMFD.
+ Note that this requires a graphics package if you want to run the animation
+ engine.
+ The package can be downloaded at http://mcsp.wartburg.edu/zelle/python/graphics.py
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Program-setup-and"
+
+\end_inset
+
+Program setup and initial conditions
+\end_layout
+
+\begin_layout Standard
+
+\size small
+A Python script was developed to simulate the conditions in the problem
+ and yield results that would be insertable into Mathematica for further
+ analysis.
+ After setting up a number of key variables, the script began by placing
+ many spheres, which were indexed in a large list, of random sizes ranging
+ from the size of a grain of sand to 20 times that of the beetle at random
+ locations in a 
+\begin_inset Formula $1\times1$
+\end_inset
+
+ meter box.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The script was designed such that all variables could be easily changed
+ by editing their initial values, so all values listed in this section were
+ simply the default values for the initial runs.
+ It was later found that large numbers of spheres in a box this small would
+ produce tremendous amounts of interference with the other spheres' final
+ heights per iteration, with smaller spheres getting caught in larger spheres'
+ potential wells, so a set of runs with only one sphere per box was run
+ for a large number of instances to simulate a box with spheres far enough
+ from each other such that interaction between spheres could be negligible.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Results"
+
+\end_inset
+
+ for more detail on this.
+\end_layout
+
+\end_inset
+
+After sphere placement was finished, the program simulated scattering a
+ 5mm layer of sand and food uniformly over the bed of sand and glass.
+ An overlapTest() function was developed to check whether sand/food would
+ overlap with the spheres when falling down.
+ If it did, it returned the index of the sphere the overlap occurred with
+ and scaled the displacement vector of the particle from the center of the
+ sphere such that the magnitude was equal to the radius of the sphere, simulatin
+g the particle sliding off the edge of the sphere.
+ This caused a large portion of the food to collect around the edges of
+ the spheres, with larger spheres having a higher food concentration on
+ their edges than the smaller spheres, since the amount of food falling
+ on the sphere was proportional to the area, while the amount of space it
+ could collect in was proportional only to the circumference.
+\end_layout
+
+\begin_layout Standard
+
+\size small
+A rudimentary animation engine was also developed using the Python graphics
+ package to qualitatively check the operations being developed in the program,
+ as shown in Figure 1.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename C:/Users/Ben/Pictures/Screenshots/Screenshot (9).png
+	width 100col%
+	height 100col%
+	keepAspectRatio
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\size small
+An output of the animation algorithm from a top-down view of the box.
+ The blue line represents the path traveled by the beetle, the red dots
+ are food particles, and the black circles are positions of the spheres
+ over time as they are moved by the beetle.
+ Note that the beetle width is not displayed here, but is larger than the
+ width of the blue line.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\size small
+Following the calculation and placement of food positions, a while loop
+ was created that evaluates the quantity checkSum, which represents the
+ total number of food particles remaining, and loops until checkSum equals
+ zero.
+ This represents the body of the simulation, where the beetle moves itself
+ and the spheres, affecting sand elevations.
+ Four main functions are called during this loop: moveBeetle(), depressSand(),
+ moveSphere(), and eat(), each of which utilize many smaller subfunctions.
+ (See the source code at the end of this paper for details.) These will be
+ discussed below.
+\end_layout
+
+\begin_layout Subsection
+The moveBeetle() function
+\end_layout
+
+\begin_layout Standard
+
+\size small
+The moveBeetle() function calls a function to determine the path of steepest
+ ascent into the potential field created by the food particles by calculating
+ the gradient of the function, as described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Approximating-the-beetle's"
+
+\end_inset
+
+.
+ It then normalizes the vector to have a magnitude corresponding to a predefined
+ velocity, and increments the beetle's position by the 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+ components of the vector.
+ This ensures that, when food is plenty, the beetle will generally head
+ to the nearest source of food, and when food is almost completely consumed,
+ it will head towards other available regions of the box.
+ Though more efficient search patterns exist, we assume the beetle lacks
+ the capacity to plan ahead, so at any given time, it is focused only on
+ immediately maximizing its food potential function.
+ The beetle is allowed to move to any location within the box, while the
+ spheres are limited to the size of the box minus a buffer zone to keep
+ them from being caught in the corners of the box.
+\end_layout
+
+\begin_layout Subsection
+The eat() function
+\end_layout
+
+\begin_layout Standard
+
+\size small
+If the beetle is within a distance from a food particle that is equal to
+ 
+\begin_inset Formula $eatDistance=beetle\, radius\,+\,1$
+\end_inset
+
+, then it will 
+\begin_inset Quotes eld
+\end_inset
+
+eat
+\begin_inset Quotes erd
+\end_inset
+
+ the food, turning off the corresponding element in the foodPresent array,
+ which is a large square array initially composed entirely of 1's with edge
+ length equal to the square root of the total number of food particles (which
+ will always be an integer, since food is dispersed on a square matrix).
+ The food particles have separate indices and 
+\begin_inset Formula $x/y$
+\end_inset
+
+ positions, so the foodPresent array turns from a 1 to a 0 the element at
+ the vertical and horizontal index of the array corresponding to the closest
+ particle whose distance is less than eatDistance, effectively excluding
+ that particle from future potential function calculations.
+ One of the biggest challenges in the course of writing this program arose
+ in this function, where a misuse of the min() function in Python on a two-dimen
+sional array was causing the foodPresent array to fail to update for particles
+ that were outside their natural alignment due to having slid down the sides
+ of spheres.
+ This caused the beetle to oscillate back and forth endlessly.
+ The min() function was replaced with a simple brute-force algorithm to
+ determine the distances from the beetle to all of the spheres and take
+ the smallest of them as the minimum of the distances.
+ Fortunately, this solved the problem without wasting too much computational
+ power compared the computation power required for the rest of the program.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:The-depressSand()-function"
+
+\end_inset
+
+The depressSand() function
+\end_layout
+
+\begin_layout Standard
+
+\size small
+As the beetle moves around the sand, it activates the depressSand() function
+ for both itself and the spheres it moves.
+ As discussed in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Effects-of-object"
+
+\end_inset
+
+, the velocity at which the beetle or sphere sinks while moving in the sand
+ is equal to its terminal velocity while falling through the vibrofluidized
+ sand.
+ The total displacement value is this velocity divided by a constant representin
+g the number of iterations in one second, which is arbitrarily set as 10,
+ but cancels out through various calculations throughout the program.
+ This displacement value is subtracted from a circular subset of the square
+ sandLevels array, with a radius and center corresponding to the radius
+ and position of the sphere on the sand.
+ The sandLevels array has dimensions 
+\begin_inset Formula $\frac{boxSize}{sandSize}$
+\end_inset
+
+, where boxSize is the edge length of the box in mm, and sandSize is the
+ size of a grain of sand in mm.
+ To prevent the calculations from taking infeasibly large amounts of memory,
+ sandSize is set to 1mm, since the size of the sand grains is not included
+ in the fluidity calculations (we assume they are sufficiently small as
+ to display the type of behavior shown in the study by Knappman), and as
+ such has no bearing on the results of the program other than the resolution
+ of the final sandLevels array.
+ However, the beetle displaces the same amount of sand upwards in a ring
+ outside its depression zone as it displaces downward, ensuring that sand
+ is conserved and that the beetle will stay at a constant elevation if it
+ keeps moving across the sand to regions where it has not already been.
+ An example of the sand elevation output after one iteration in the program
+ from the depressSand() function when applied to the beetle and the spheres
+ can be seen in Figure 2.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename C:/Users/Ben/Pictures/sand elevation.PNG
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\size small
+Sand elevation levels after one iteration in the program, plotted in Mathematica
+, with the height exaggerated to show detail.
+ Note that the 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+ axes span 100 cm, while the height variation for z is about 4 mm.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:The-moveSphere()-function"
+
+\end_inset
+
+The moveSphere() function
+\end_layout
+
+\begin_layout Standard
+
+\size small
+When the beetle comes in contact with a sphere in the sand, it activates
+ the moveSphere() function, which calculates the angle at which the beetle
+ is colliding with the sphere and moves the sphere in the direction orthogonal
+ to the line that is tangent to the edge of the sphere at the point of contact.
+ (Since the vector component parallel to the tangent line would simply torque
+ the sphere into rotating about its axis in that direction, only the orthogonal
+ vector is used.) It then starts the sphere moving with initial velocity
+ and deceleration as calculated in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Calculating-the-distance"
+
+\end_inset
+
+.
+ For simplification purposes, and in order to discretize the continual movement
+ of the sphere into the finite number of iterations in the program, we assume
+ the beetle does not resume moving until the sphere has reached its final
+ destination.
+ The program then updates the arrays representing the 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+ positions of the spheres to their new values, and, if the graphical interface
+ is enabled (it is disabled for long runs to save computation power), it
+ draws the new position of the spheres.
+ (It does not erase the old sphere position, which is the reason for the
+ many concentric circles in Figure 1.)
+\end_layout
+
+\begin_layout Subsection
+Data exportation
+\end_layout
+
+\begin_layout Standard
+
+\size small
+At the end of the while loop, the program compiles all of the final data
+ describing sand elevation, sphere height, and sphere height trends over
+ time into a .dat file formatted in a manner that, with a small modification,
+ can easily be imported into Mathematica for further analysis.
+ These files are set up as a set of 
+\begin_inset Formula $x,y,z$
+\end_inset
+
+ coordinates for the sand heights and sphere heights over time, and as a
+ set of 
+\begin_inset Formula $x,y$
+\end_inset
+
+ coordinates for final sphere heights at the end of the simulation.
+ When exporting the sand elevation data, the program reduces the size of
+ the matrix to include every element at coordinates 
+\begin_inset Formula $[n,n]$
+\end_inset
+
+, where 
+\begin_inset Formula $n$
+\end_inset
+
+ is a predefined value stored in the variable mathematicaExportResolution.
+ This allows the data to be easily plottable in Mathematica, as data sets
+ too large will crash the program.
+ Optionally, it will also export all data per iteration, though this option
+ was disabled during the computation with the Amazon Web Services cluster
+ (see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Results"
+
+\end_inset
+
+) to halve the amount of data that must be downloaded following the simulation.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Results"
+
+\end_inset
+
+Results
+\end_layout
+
+\begin_layout Subsection
+Initial results, multiple spheres per simulation
+\end_layout
+
+\begin_layout Standard
+
+\size small
+The program was initially run with a large number (about 50) of spheres
+ packed into the box in order to gather the maximum amount of data per run
+ as was possible.
+ However, upon analyzing this initial data, it was found that no clear correlati
+on between sphere size and elevation above the original sand level was present,
+ as shown in Figure 3.
+\end_layout
+
+\begin_layout Standard
+
+\size small
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size small
+\begin_inset Graphics
+	filename C:/Users/Ben/Pictures/noisydata.PNG
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\size small
+Sphere elevation as compared to sphere radius.
+ Original data obtained from using a large number of spheres per simulation.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Single-sphere simulations
+\end_layout
+
+\begin_layout Standard
+
+\size small
+After further analysis, this problem was found to be due to the fact that
+ many of the smaller spheres were getting caught in the potential wells
+ created by the larger spheres after tens of iterations had passed, resulting
+ in a set of data that was, for all intents and purposes, random noise.
+ To remedy this problem, simulations with only one sphere per box were conducted.
+ This would approximate having a large box with spheres placed sufficiently
+ far away from each other so as to avoid any problematic interactions between
+ them that would introduce extraneous noise into the data.
+ The initial results of the first few runs of this simulation are shown
+ below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename C:/Users/Ben/Pictures/initialdata.PNG
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\size small
+Initial data from single-sphere simulation after one iteration of the program.
+ Notice the much clearer correlation between mass and elevation levels,
+ similar to the ones described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Effects-of-object"
+
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Large-scale computation of single-sphere simulations
+\end_layout
+
+\begin_layout Standard
+
+\size small
+As observable in Figure 4, this shows a far clearer correlation in sphere
+ heights compared to sphere radii, and even seems to follow the cubic function
+ discussed at the end of 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Effects-of-object"
+
+\end_inset
+
+.
+ Though the single-sphere simulation produced data with lower noise levels,
+ far less data could be gathered per simulation.
+ This necessitated the use of large numbers of simulations, which, due to
+ the computational complexity and inefficiency of the program, would be
+ problematic even for powerful desktop processors.
+ To solve this problem, a large-scale version the simulation was run on
+ a computing-optimized cc2.8xlarge cluster rented from Amazon Web Services
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Stats on the computing cluster: 64-bit processor, 32 cores, 60.5GB RAM, 3.36TB
+ storage, 10Gigabit network connection, 88EC2 compute units.
+ (One EC2 compute unit provides the equivalent CPU capacity of a 1GHz 2007
+ Xeon processor.) [6]
+\end_layout
+
+\end_inset
+
+.
+ The program was modified to accept a programID argument in the command
+ line of the SSH terminal, such that it could use this to output data to
+ non-conflicting files, and the each of the 32 cores was given a bundle
+ of 25 instances of the simulation to run, each with 20 iterations, except
+ the last core, which was kept idle to ensure the system remained responsive
+ to user input.
+ This resulted in a total of 775 individual tests each with 20 iterations.
+ The cores ran near 100% capacity for approximately 7.5 hours before they
+ finished their calculations and wrote the final data to the .dat files,
+ which were then combined and inserted into Mathematica for further analysis.
+\end_layout
+
+\begin_layout Standard
+
+\size small
+The results from this simulation yielded a data set that was much more in
+ line with what the calculations in the first part of this paper predicted,
+ albeit with a rather large error bound appearing towards large numbers
+ of iterations.
+ Shown in Figure 5 is the final sphere height distribution compared to sphere
+ radii after all 20 iterations of the simulation had been completed.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename C:/Users/Ben/Pictures/finaldata2d.PNG
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\size small
+Final results of sphere height over sphere radii from the large-scale simulation
+ after all 20 iterations had completed.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\size small
+Data had also been gathered for each of the iterations in the 20 iteration
+ run, allowing the trend in sphere heights to be evaluated over time.
+ Figure 6 shows a 3D plot of the sphere elevation data with respect to time
+ (number of iterations, measured in days) and sphere radius.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename C:/Users/Ben/Pictures/finaldata3d 2.PNG
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\size small
+Results of sphere heights tracked from back to front over time (in 20 discrete,
+ color-coded iterations) and from left to right over sphere radius.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Cubic-regression-on"
+
+\end_inset
+
+Cubic regression on data sets
+\end_layout
+
+\begin_layout Standard
+
+\size small
+Though the more practical method for determining height distribution above
+ the surface would be to simply subdivide the data found in Figure 6 into
+ subsets and make a data table for height compared to radius and time, the
+ problem specifically asked to give the height distribution as a function
+ of time.
+ This suggested we perform some sort of non-linear regression on the data
+ to yield a polynomial function of height with respect to sphere radius
+ and time.
+ Using the previously derived cubic relation between sphere height and sphere
+ elevation found in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Effects-of-object"
+
+\end_inset
+
+, Mathematica's 
+\begin_inset Formula $NonlinearModelFit[]$
+\end_inset
+
+ function was utilized to create a third-order regression to approximate
+ the sphere elevation values over their radii as a plottable function.
+\end_layout
+
+\begin_layout Standard
+
+\size small
+Given conservation of sand, we know that the average height of the sand
+ at 
+\begin_inset Formula $n$
+\end_inset
+
+ iterations past starting is 
+\begin_inset Formula $5\cdot n$
+\end_inset
+
+ mm, since 5mm of sand is added per iteration, as discussed in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Program-setup-and"
+
+\end_inset
+
+.
+ As the size of the glass spheres approaches that of the grains of sand,
+ the beetle would collide into the spheres less and the depression value
+ of the collision in the sand would approach zero.
+ Therefore, we can assume that the average height for glass spheres with
+ size similar to that of sand is equal to the average height of the sand
+ at some number of iterations.
+ Thus, the function must take the form 
+\begin_inset Formula $ax^{3}+100$
+\end_inset
+
+, where 
+\begin_inset Formula $a$
+\end_inset
+
+, we presume by looking at the data, is negative.
+ Performing this regression on the data for the final sphere positions yields
+ the function describing sphere elevation of 
+\begin_inset Formula 
+\[
+h(r)=-5.62\times10^{-6}r^{3}+100,
+\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $r$
+\end_inset
+
+ is the sphere radius.
+ Shown in Figure 6 is the overlay of this function onto the data.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename C:/Users/Ben/Pictures/finaldata2d with graph.PNG
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\size small
+The regression mentioned above overlaid over Figure 5.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\size small
+Similarly, we can use a three-dimensional analog of this regression method
+ to analyze the data over the course of several iterations.
+ Applying this three-dimensional regression would yield some function in
+ the form 
+\begin_inset Formula $z=axy^{3}+5x$
+\end_inset
+
+, where 
+\begin_inset Formula $x$
+\end_inset
+
+ represents time in iterations, 
+\begin_inset Formula $y$
+\end_inset
+
+ represents sphere radii, and 
+\begin_inset Formula $z$
+\end_inset
+
+ represents sphere elevation.
+ The rationale for the use of this form of function is as follows: for sufficien
+tly small sphere radii (geometrically, near the line 
+\begin_inset Formula $y=0$
+\end_inset
+
+), 
+\begin_inset Formula $z$
+\end_inset
+
+ depends linearly on 
+\begin_inset Formula $x$
+\end_inset
+
+, since 5mm of sand are added every iteration.
+ Along each iteration (where there is zero change in 
+\begin_inset Formula $x$
+\end_inset
+
+), 
+\begin_inset Formula $z$
+\end_inset
+
+ varies with 
+\begin_inset Formula $y^{3}$
+\end_inset
+
+.
+ However, at the beginning of the simulation (seen in Figure 6 as the red
+ data set in the back), there has been almost no disturbance in the system,
+ so 
+\begin_inset Formula $z$
+\end_inset
+
+ is dependent only on the initial sand levels, which increase with 
+\begin_inset Formula $x$
+\end_inset
+
+ (increase over time).
+ (Hypothetically, should a 
+\begin_inset Formula $0^{th}$
+\end_inset
+
+ iteration have been performed, all spheres would be on exactly the same
+ elevation of 
+\begin_inset Formula $z=0$
+\end_inset
+
+.) Thus, the degree to which 
+\begin_inset Formula $y^{3}$
+\end_inset
+
+ is present in 
+\begin_inset Formula $z$
+\end_inset
+
+ is also linearly dependent on 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ Therefore, along a given iteration, 
+\begin_inset Formula $z$
+\end_inset
+
+ varies with 
+\begin_inset Formula $xy^{3}$
+\end_inset
+
+.
+ Combining these two axes, we have our originally described function 
+\begin_inset Formula $z=axy^{3}+5x$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\size small
+Inserting this function into the 
+\begin_inset Formula $NonlinearModelFit[]$
+\end_inset
+
+ function in Mathematica yields the regressed function 
+\begin_inset Formula 
+\[
+h(x,y)=-2.62\times10^{-7}xy^{3}+5x
+\]
+
+\end_inset
+
+.
+ Qualitatively, this function fits very well with the expected contour of
+ the function when plotted against the data, as shown in Figure 8.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename C:/Users/Ben/Pictures/finaldata3d with graph.PNG
+	width 100col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\size small
+Figure 6 overlaid against the regression function.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Error bound analysis
+\end_layout
+
+\begin_layout Standard
+
+\size small
+As is visually obvious in Figure 7, the variation from the expected values
+ of the sphere heights increases as radius increases.
+ This is due to the fact that, due to higher food concentrations around
+ the edges, larger spheres have more interactions with the beetle, causing
+ the system to become more stochastic.
+ This holds true over time as well, as shown in Figure 8, with the variation
+ from the expected elevation values for small sphere radii remaining almost
+ zero even after 20 iterations of the program.
+ Furthermore, the variance from the expected values of height in Figure
+ 8 at larger radii is almost zero for low iteration numbers, and is very
+ large for high iteration numbers.
+ Thus, we can qualitatively say that the variance of the system is dependent
+ on the sphere radius and time.
+\end_layout
+
+\begin_layout Standard
+
+\size small
+This could suggest that we break up the data set into small pieces along
+ the 
+\begin_inset Formula $xy$
+\end_inset
+
+ plane and determine the average variance along each small portion of the
+ data set.
+ We could then use a similar regression method as the one used in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Cubic-regression-on"
+
+\end_inset
+
+ to determine a function describing the magnitude of the variance with respect
+ to 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+.
+ However, not enough research was put into the analysis of the variance
+ in this highly stochastic system to justify its regression into a particular
+ type of function, as we do not know to what degree the variance is dependent
+ on 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+.
+ Thus, for the purposes of this paper, we express the magnitude of the variance
+ as some general unknown error function varying along some relation to 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+, denoted as 
+\begin_inset Formula $\delta(x,y)$
+\end_inset
+
+.
+ Alternately, 
+\begin_inset Formula $\delta$
+\end_inset
+
+ could simply represent 
+\begin_inset Formula $n$
+\end_inset
+
+ number of standard deviations for the sphere heights among some subsection
+ 
+\begin_inset Formula $(\Delta x,\Delta y)$
+\end_inset
+
+ of the overall data set, allowing us to make the prediction that some large
+ percentage of spheres with a given radius and at a given time will be within
+ a certain height interval.
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+
+\size small
+Assembling all of the information gathered in the above sections into a
+ single formula, the expected value for the sphere heights as a function
+ with respect to time and sphere radii is:
+\begin_inset Formula 
+\begin{equation}
+h(t,r)=-2.62\times10^{-7}tr^{3}+5t
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $t$
+\end_inset
+
+ is time, measured in days (iterations), 
+\begin_inset Formula $r$
+\end_inset
+
+ is the sphere radius in mm, 5 represents the 5 mm of sand per day that
+ is added along with the new food prior to the beetle being released, and
+ -2.62 is a constant determined through experimental analysis, measured in
+ arbitrary units of 
+\begin_inset Formula $mm^{-2}\cdot s^{-1}$
+\end_inset
+
+to ensure unit consistency.
+ Adding in our variance function, the range of possible sphere heights over
+ time and radii would then be:
+\begin_inset Formula 
+\[
+h(t,r)=-2.62\times10^{-7}tr^{3}+5t\pm\delta(t,r)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\size small
+
+\begin_inset Formula $\delta(t,r)$
+\end_inset
+
+ is the variance function representing the uncertainty of the height as
+ the system becomes increasingly stochastic.
+\end_layout
+
+\begin_layout Section
+References
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align left
+
+\size small
+[1]:http://www.engineeringtoolbox.com/friction-coefficients-d_778.html
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align left
+
+\size small
+[2]:http://www.engineeringtoolbox.com/density-materials-d_1652.html
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align left
+
+\size small
+[3]:http://www.engineeringtoolbox.com/density-solids-d_1265.html
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align left
+
+\size small
+[4]:http://en.wikipedia.org/wiki/Hercules_beetle
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align left
+
+\size small
+[5]:http://www.physics.ohio-state.edu/~reu/99reu/final_reports/paper_knappman.pdf
+\end_layout
+
+\begin_layout Standard
+
+\size small
+[6]:http://aws.amazon.com/ec2/instance-types/ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset External
+	template PDFPages
+	filename C:/Users/Ben/Documents/Hurdle 1 code.pdf
+	extra LaTeX "pages=-"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
